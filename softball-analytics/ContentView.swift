@@ -8,54 +8,54 @@
 import SwiftUI
 import SwiftData
 
+import SwiftUI
+
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @State private var playerName: String = ""
+    @State private var teamName: String = ""
+    @State private var notes: String = ""
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
+        VStack {
+            Spacer() // pushes content to vertical center
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
+            VStack(alignment: .leading, spacing: 15) {
+                Text("Enter Player Info")
+                    .font(.title2)
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+                TextField("Player Name", text: $playerName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                TextField("Team Name", text: $teamName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                TextEditor(text: $notes)
+                    .frame(height: 80)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                    )
+
+                Button("Save") {
+                    print("Player: \(playerName), Team: \(teamName), Notes: \(notes)")
+                }
+                .buttonStyle(.borderedProminent)
+                .frame(maxWidth: .infinity, alignment: .center) // center the button
+                .padding(.top, 10)
             }
+            .padding()
+            .frame(maxWidth: 300) // controls width of the box
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemGray6))
+            )
+
+            Spacer() // pushes content from the bottom
         }
+        .padding()
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
