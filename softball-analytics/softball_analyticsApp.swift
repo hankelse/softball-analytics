@@ -16,7 +16,8 @@ struct softball_analyticsApp: App {
             Team.self,
             Player.self,
             Game.self,
-            Play.self
+            Play.self,
+            Runner.self
         ])
         
         // This configuration works for local storage or private CloudKit syncing.
