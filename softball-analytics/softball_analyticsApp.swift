@@ -12,8 +12,14 @@ import SwiftData
 struct softball_analyticsApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Season.self,
+            Team.self,
+            Player.self,
+            Game.self,
+            Play.self
         ])
+        
+        // This configuration works for local storage or private CloudKit syncing.
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
