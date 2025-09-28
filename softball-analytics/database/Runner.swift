@@ -17,10 +17,9 @@ class Runner {
     // The play that caused this action. This is the inverse relationship.
     var play: Play?
     
-    // Where the runner ended up. Nil if they scored or were put out.
+    // Where the runner ended up.
     var base: Base?
     
-    // Your boolean flags and out reason.
     var didScore: Bool
     var wasOut: Bool
     var outReason: OutReason?

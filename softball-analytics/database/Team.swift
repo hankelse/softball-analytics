@@ -13,14 +13,11 @@ class Team {
     @Attribute(.unique) var id: UUID = UUID()
     var name: String
     
-    @Relationship(deleteRule: .cascade, inverse: \Player.team)
-    var players: [Player]?
+    // Connects to all instances of this team's participation across all seasons.
+    @Relationship(inverse: \SeasonRoster.team)
+    var seasonRosters: [SeasonRoster]?
 
-    // This is the added property that links a Team back to a Season.
-    var season: Season?
-
-    init(name: String, season: Season?) { // Added season to initializer
+    init(name: String) {
         self.name = name
-        self.season = season
     }
 }

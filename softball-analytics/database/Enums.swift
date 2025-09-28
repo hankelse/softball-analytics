@@ -13,7 +13,7 @@ enum Base: Int, Codable, CaseIterable {
     case first = 1
     case second = 2
     case third = 3
-    case home = 4 // For tracking a scored run's completion
+    case home = 4
 }
 
 // Used by Play to categorize the type of pitch thrown.
@@ -23,10 +23,10 @@ enum PitchType: String, Codable, CaseIterable {
 
 // Used by Play to define the outcome of a pitch.
 enum PitchResult: String, Codable, CaseIterable {
-    case ball, strikeLooking, strikeSwinging, foul, hitInPlay, hitByPitch
+    case ball, strikeLooking, strikeSwinging, foul, hit, hitByPitch
 }
 
 // Used by RunnerAction to specify why a player was out.
 enum OutReason: String, Codable, CaseIterable {
-    case forceOut, tagOut, flyOut, strikeout, caughtStealing, fielderChoice
+    case forceOut, tagOut, flyOut, groundout, caughtStealing, fielderChoice
 }

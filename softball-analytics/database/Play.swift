@@ -8,8 +8,6 @@
 import Foundation
 import SwiftData
 
-// MARK: - Supporting Enums
-
 @Model
 class Play {
     @Attribute(.unique) var id: UUID = UUID()
@@ -42,7 +40,7 @@ class Play {
     
     // Actions taken by runners as a result of this play.
     @Relationship(deleteRule: .cascade, inverse: \Runner.play)
-    var runnerActions: [Runner]?
+    var runners: [Runner]?
 
     init(inning: Int, isTopInning: Bool, balls: Int, strikes: Int, outs: Int) {
         self.inning = inning

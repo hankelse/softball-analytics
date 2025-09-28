@@ -13,8 +13,8 @@ class Game {
     @Attribute(.unique) var id: UUID = UUID()
     var date: Date
     
-    var homeTeam: Team?
-    var awayTeam: Team?
+    var homeTeam: SeasonRoster?
+    var awayTeam: SeasonRoster?
     
     var homeTeamLineup: [Player]?
     var awayTeamLineup: [Player]?
@@ -22,13 +22,12 @@ class Game {
     @Relationship(deleteRule: .cascade, inverse: \Play.game)
     var plays: [Play]?
 
-    // This is the added property that links a Game back to a Season.
     var season: Season?
 
     var finalHomeScore: Int?
     var finalAwayScore: Int?
 
-    init(date: Date, season: Season?) { // Added season to initializer
+    init(date: Date, season: Season?) {
         self.date = date
         self.season = season
     }
