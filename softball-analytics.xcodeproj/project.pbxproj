@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7D927CE32E8997DF00CE5754 /* .gitignore in Sources */ = {isa = PBXBuildFile; fileRef = 7D927CE22E8997DA00CE5754 /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C4B12C3B2E86EEE400518D8F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7D927CE22E8997DA00CE5754 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		C4B12C292E86EEE200518D8F /* softball-analytics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "softball-analytics.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4B12C3A2E86EEE400518D8F /* softball-analyticsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "softball-analyticsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C4B12C442E86EEE400518D8F /* softball-analyticsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "softball-analyticsUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,6 +97,7 @@
 				C4B12C3D2E86EEE400518D8F /* softball-analyticsTests */,
 				C4B12C472E86EEE400518D8F /* softball-analyticsUITests */,
 				C4B12C2A2E86EEE200518D8F /* Products */,
+				7D927CE22E8997DA00CE5754 /* .gitignore */,
 			);
 			sourceTree = "<group>";
 		};
@@ -249,6 +255,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D927CE32E8997DF00CE5754 /* .gitignore in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
