@@ -15,6 +15,15 @@ class Player {
     // This allows navigation from a player to their entire career history.
     @Relationship(inverse: \RosterEntry.player)
     var rosterEntries: [RosterEntry]?
+    
+    @Relationship(inverse: \Play.batter)
+    var playsAsBatter: [Play]?
+    
+    @Relationship(inverse: \Play.pitcher)
+    var playsAsPitcher: [Play]?
+    
+    @Relationship(inverse: \Runner.player)
+    var actionsAsRunner: [Runner]?
 
     init(name: String) {
         self.name = name

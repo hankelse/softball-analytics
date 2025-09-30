@@ -18,6 +18,12 @@ class SeasonRoster {
     // Link to the season this roster is for
     var season: Season?
     
+    @Relationship(inverse: \Game.homeRoster)
+    var homeGames: [Game]?
+    
+    @Relationship(inverse: \Game.awayRoster)
+    var awayGames: [Game]?
+    
     // The roster of players for THIS TEAM in THIS SEASON.
     // We use RosterEntries as a bridge. This is the roster entry for a given player during a given season.
     @Relationship(deleteRule: .cascade, inverse: \RosterEntry.seasonRoster)

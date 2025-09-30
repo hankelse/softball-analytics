@@ -13,8 +13,8 @@ class Game {
     @Attribute(.unique) var id: UUID = UUID()
     var date: Date
     
-    var homeTeam: SeasonRoster?
-    var awayTeam: SeasonRoster?
+    var homeRoster: SeasonRoster?
+    var awayRoster: SeasonRoster?
     
     var homeTeamLineup: [Player]?
     var awayTeamLineup: [Player]?
@@ -27,10 +27,10 @@ class Game {
     var finalHomeScore: Int?
     var finalAwayScore: Int?
 
-    init(date: Date, season: Season?, homeTeam: SeasonRoster?, awayTeam: SeasonRoster?) {
+    init(date: Date, season: Season?, homeRoster: SeasonRoster?, awayRoster: SeasonRoster?) {
         self.date = date
         self.season = season
-        self.homeTeam = homeTeam
-        self.awayTeam = awayTeam
+        self.homeRoster=homeRoster
+        self.awayRoster=awayRoster
     }
 }
