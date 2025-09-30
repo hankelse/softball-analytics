@@ -20,8 +20,8 @@ class SeasonRoster {
     
     // The roster of players for THIS TEAM in THIS SEASON.
     // We use RosterEntries as a bridge. This is the roster entry for a given player during a given season.
-    @Relationship(deleteRule: .cascade, inverse: \Player.seasonRoster)
-    var players: [RosterEntry]?
+    @Relationship(deleteRule: .cascade, inverse: \RosterEntry.seasonRoster)
+    var entries: [RosterEntry]?
     
     // Season stats
     var wins: Int = 0
