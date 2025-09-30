@@ -9,47 +9,120 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @State private var playerName: String = ""
+    @State private var teamName: String = ""
+    @State private var notes: String = ""
+    @State private var showExtraFields1: Bool = false
+    @State private var showExtraFields2: Bool = false
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
+        ZStack(alignment: .top) {
+            Color.white.ignoresSafeArea()
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
+            VStack(spacing: 0) {
+                // HEADER
+                Rectangle()
+                    .fill(Color.blue.opacity(0.9))
+                    .frame(height: 60)
+                    .overlay(
+                        Text("Softball Analytics")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    )
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+                Spacer()
+
+                // Main
+                VStack(alignment: .leading, spacing: 15) {
+                    Text("TOP OF 3RD")
+                        .font(.title2)
+                        .foregroundColor(.black)
+
+                    HStack(spacing: 15) {
+                        TextField("Player Name", text: $playerName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                        TextField("Team Name", text: $teamName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+
+                    HStack(spacing: 15) {
+                        TextField("Player Name", text: $playerName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                        TextField("Team Name", text: $teamName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+
+                    TextEditor(text: $notes)
+                        .frame(height: 200)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                        )
+
+                    // COLLAPSIBLE SECTION
+                    DisclosureGroup("Last Pitch", isExpanded: $showExtraFields1) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            TextField("Batting Average", text: .constant(""))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                            TextField("Home Runs", text: .constant(""))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                            TextField("RBIs", text: .constant(""))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                        }
+                        .padding(.top, 5)
+                    }
+                    .padding(.top, 5)
+                    .foregroundColor(.blue)
+                    .font(.headline)
+
+                    // SECOND COLLAPSIBLE SECTION
+                    DisclosureGroup("2 Pitches Ago", isExpanded: $showExtraFields2) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            TextField("Batting Average", text: .constant(""))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                            TextField("Home Runs", text: .constant(""))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                            TextField("RBIs", text: .constant(""))
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                        }
+                        .padding(.top, 5)
+                    }
+                    .padding(.top, 5)
+                    .foregroundColor(.blue)
+                    .font(.headline)
+
+                    Button("Save") {
+                        print("Player: \(playerName), Team: \(teamName), Notes: \(notes)")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 10)
+                }
+                .padding()
+                .frame(maxWidth: 800)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(.systemGray6))
+                )
+                .padding(.horizontal)
+
+                Spacer()
+
+                // FOOTER
+                Rectangle()
+                    .fill(Color.blue.opacity(0.9))
+                    .frame(height: 50)
+                    .overlay(
+                        Text("© 2025 Softball Analytics")
+                            .font(.footnote)
+                            .foregroundColor(.white)
+                    )
             }
         }
     }
@@ -57,5 +130,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
