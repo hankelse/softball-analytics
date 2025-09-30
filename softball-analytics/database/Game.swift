@@ -27,8 +27,10 @@ class Game {
     var finalHomeScore: Int?
     var finalAwayScore: Int?
 
-    init(date: Date, season: Season?) {
+    init(date: Date, season: Season?, homeTeam: SeasonRoster?, awayTeam: SeasonRoster?) {
         self.date = date
         self.season = season
+        self.homeTeam = homeTeam
+        self.awayTeam = awayTeam
     }
 }
