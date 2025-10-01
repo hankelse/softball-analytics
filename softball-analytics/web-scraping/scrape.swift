@@ -116,6 +116,46 @@ func validate_school_name(schedule_links: [String: String], school_name: String)
     }
 }
 
+
+// def download_pdf(url: str, local_filename: str) -> None:
+//     try:
+//         response = requests.get(url, stream=True)
+//         response.raise_for_status()
+
+//         with open(local_filename, 'wb') as f:
+//             f.write(response.content)
+
+//         print(f"PDF '{local_filename}' downloaded successfully.")
+
+//     except requests.exceptions.RequestException as e:
+//         print(f"Error downloading PDF: {e}")
+
+func download_pdf(url: String, local_filename: String) async throws -> Void {
+    guard let url: URL = URL(string: url) else {
+        throw URLError(.badURL)
+    }
+
+    let (data, response) = try await URLSession.shared.data(from: url)
+
+    guard let httpResponse: HTTPURLResponse = response as? HTTPURLResponse,
+          (200...299).contains(httpResponse.statusCode) else {
+        throw URLError(.badServerResponse)
+    }
+
+    // Get file path to write to
+    let fileURL: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        .appendingPathComponent(local_filename)
+
+    do {
+        try data.write(to: fileURL)
+        print("PDF '\(local_filename)' downloaded successfully.")
+    } catch {
+        print("Error writing PDF to disk: \(error.localizedDescription)")
+        throw error
+    }
+}
+
+
 // def main():
 //     # TODO: figure out how to get rid duplicates - name them with both teams and the date, and then webscrape and check that info in the pdfs folder before actually downloading the PDF?
 //     for year in [2025]:
@@ -154,7 +194,6 @@ func main() async {
 
     print("hi")
     for year in [2025] {
-        print(year)
         let school_names = schedule_links.keys.sorted()
         for school_name: String in school_names {
             let url: String = validate_school_name(schedule_links: schedule_links, school_name: school_name)
@@ -164,11 +203,12 @@ func main() async {
             do {
                 let links: [String] = try await get_box_score_links(url: url, base_url: base_url)
                 for (index, link) in links.enumerated() {
-                    print(index)
-                    let pdf_view_link = try await base_url + get_pdf_view_link(link)
+                    let pdf_view_link: String = try await base_url + get_pdf_view_link(link)
                     print("pdf_view_link=\(pdf_view_link)")
-                    let downloadable_link = try await get_download_link(from: pdf_view_link)
-                    print("downloadable link: \(downloadable_link)")
+                    let downloadable_link: String = try await get_download_link(from: pdf_view_link)
+                    print("downloadable link=\(downloadable_link)")
+                    print("Downloading PDF...")
+                    try await download_pdf(url: downloadable_link, local_filename: "\(school_name)-\(year)-\(index).pdf")
                 }
             } catch {
                 print("Error getting box score links:", error)
