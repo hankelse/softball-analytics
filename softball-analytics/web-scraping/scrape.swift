@@ -208,7 +208,7 @@ func main() async {
                     let downloadable_link: String = try await get_download_link(from: pdf_view_link)
                     print("downloadable link=\(downloadable_link)")
                     print("Downloading PDF...")
-                    try await download_pdf(url: downloadable_link, local_filename: "\(school_name)-\(year)-\(index).pdf")
+                    try await download_pdf(url: downloadable_link, local_filename: "pdfs/\(school_name)-\(year)-\(index).pdf")
                 }
             } catch {
                 print("Error getting box score links:", error)
