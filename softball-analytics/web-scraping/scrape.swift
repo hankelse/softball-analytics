@@ -1,14 +1,17 @@
 //
+//  A scraper to get box score/play by play PDFs off the NESCAC athletics websites
 //  scrape.swift
 //  softball-analytics
 //
-//  Created by Hank Elsesser on 9/26/25.
+//  Josh Smith
+//  10/1/25
 //
 
 import Foundation
 import SwiftSoup
 
 func fetch_text(from urlString: String) async throws -> String {
+    // Get the html from a url, acting like the request.get function
     guard let url = URL(string: urlString) else {
         throw URLError(.badURL)
     }
@@ -55,14 +58,9 @@ func get_box_score_links(url: String, base_url: String) async throws -> [String]
     return Array(links)
 }
 
-// def get_pdf_view_link(url: str) -> str:
-//     """Get PDF view link from box score link"""
-//     response = requests.get(url)
-//     soup = BeautifulSoup(response.text, 'html.parser')
-//     result = soup.find("span", class_="icon-pdf").parent["href"]
-//     return result
 
 func get_pdf_view_link(_ url: String) async throws -> String {
+    // Get link for PDF view from link to box score page
     let html: String = try await fetch_text(from: url)
 
     let doc: Document = try SwiftSoup.parse(html)
@@ -77,6 +75,7 @@ func get_pdf_view_link(_ url: String) async throws -> String {
 
 
 func get_download_link(from url: String) async throws -> String {
+    // Get link to download picture 
     let html = try await fetch_text(from: url)
 
     let doc: Document = try SwiftSoup.parse(html)
@@ -96,7 +95,6 @@ func get_download_link(from url: String) async throws -> String {
         throw NSError(domain: "DownloadLinkError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Download link not found"])
     }
 
-    // Extract substring after "file_location="
     guard let range = link.range(of: "file_location=") else {
         throw NSError(domain: "DownloadLinkError", code: 2, userInfo: [NSLocalizedDescriptionKey: "file_location parameter not found"])
     }
@@ -108,7 +106,8 @@ func get_download_link(from url: String) async throws -> String {
 }
 
 
-func validate_school_name(schedule_links: [String: String], school_name: String) -> String {
+func school_name_to_url(schedule_links: [String: String], school_name: String) -> String {
+    // Return the corresponding athletics page link to the given school after checking that it's in the dictionary
     if let link: String = schedule_links[school_name] {
         return link
     } else {
@@ -117,20 +116,8 @@ func validate_school_name(schedule_links: [String: String], school_name: String)
 }
 
 
-// def download_pdf(url: str, local_filename: str) -> None:
-//     try:
-//         response = requests.get(url, stream=True)
-//         response.raise_for_status()
-
-//         with open(local_filename, 'wb') as f:
-//             f.write(response.content)
-
-//         print(f"PDF '{local_filename}' downloaded successfully.")
-
-//     except requests.exceptions.RequestException as e:
-//         print(f"Error downloading PDF: {e}")
-
 func download_pdf(url: String, local_filename: String) async throws -> Void {
+    // Download PDF into pdfs folder from the given downloadable link
     guard let url: URL = URL(string: url) else {
         throw URLError(.badURL)
     }
@@ -156,29 +143,8 @@ func download_pdf(url: String, local_filename: String) async throws -> Void {
 }
 
 
-// def main():
-//     # TODO: figure out how to get rid duplicates - name them with both teams and the date, and then webscrape and check that info in the pdfs folder before actually downloading the PDF?
-//     for year in [2025]:
-//         for school_name in ["williams"]:
-//             url = validate_school_name(school_name) + f"/{year}"
-
-//             base_url = url[:-len("/sports/softball/schedule")]
-//             print(f"{base_url=}")
-
-//             links = get_box_score_links(url, base_url)
-
-//             for index, link in enumerate(links):
-//                 # if f"pdfs/{school_name}-{year}-{index}.pdf" already in pdfs folder
-//                     # continue
-//                 pdf_view_link = base_url + get_pdf_view_link(link)
-//                 print(f"{pdf_view_link=}")
-//                 downloadable_link = get_download_link(pdf_view_link)
-//                 print(f"{downloadable_link=}")
-//                 print("Downloading PDF...")
-//                 download_pdf(downloadable_link, f"pdfs/{school_name}-{year}-{index}.pdf")
-
-
 func main() async {
+    // Controls the flow of the program
     let schedule_links: [String: String] = [
         "amherst": "https://athletics.amherst.edu/sports/softball/schedule",
         "bates": "https://gobatesbobcats.com/sports/softball/schedule",
@@ -192,21 +158,19 @@ func main() async {
         "williams": "https://ephsports.williams.edu/sports/softball/schedule",
     ]
 
-    print("hi")
     for year in [2025] {
         let school_names = schedule_links.keys.sorted()
         for school_name: String in school_names {
-            let url: String = validate_school_name(schedule_links: schedule_links, school_name: school_name)
+            let url: String = school_name_to_url(schedule_links: schedule_links, school_name: school_name)
             let base_url: String = String(url.prefix(url.count - "/sports/softball/schedule".count))
-            print("Base URL: \(base_url)")
 
             do {
                 let links: [String] = try await get_box_score_links(url: url, base_url: base_url)
                 for (index, link) in links.enumerated() {
                     let pdf_view_link: String = try await base_url + get_pdf_view_link(link)
-                    print("pdf_view_link=\(pdf_view_link)")
+
                     let downloadable_link: String = try await get_download_link(from: pdf_view_link)
-                    print("downloadable link=\(downloadable_link)")
+
                     print("Downloading PDF...")
                     try await download_pdf(url: downloadable_link, local_filename: "pdfs/\(school_name)-\(year)-\(index).pdf")
                 }
