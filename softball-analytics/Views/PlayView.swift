@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  PlayView.swift
 //  softball-analytics
 //
 //  Created by Hank Elsesser on 9/26/25.
@@ -42,7 +42,7 @@ extension Color {
     }
 }
 
-struct ContentView: View {
+struct PlayView: View {
     @Environment(\.modelContext) private var context
     
     @State private var playerName: String = ""
@@ -300,7 +300,7 @@ struct ContentView: View {
 
         do {
             try context.save()
-            print("Saved Team: \(newTeam.name)")
+            print("Saved Team: \(newTeam.name ?? "None")")
             teamName = ""
         } catch {
             print("Error saving team: \(error.localizedDescription)")
@@ -309,5 +309,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    PlayView()
 }
