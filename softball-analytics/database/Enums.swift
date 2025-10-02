@@ -18,7 +18,7 @@ enum Base: Int, Codable, CaseIterable {
 
 // Used by Play to categorize the type of pitch thrown.
 enum PitchType: String, Codable, CaseIterable {
-    case fastball, curve, slider, screwball, changeup, drop, rise
+    case fastball, curve, dropCurve, screwball, changeup, drop, rise
 }
 
 // Used by Play to define the outcome of a pitch.
