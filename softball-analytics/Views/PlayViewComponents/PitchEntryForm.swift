@@ -9,8 +9,7 @@ import SwiftUI
 
 struct PitchEntryForm: View {
     // Two-way inhertiance from parent view
-    @Binding var playerName: String
-    @Binding var teamName: String
+    @Bindable var play: Play
     @Binding var pitchingType: PitchType?
     @Binding var pitchingResult: PitchResult?
     
@@ -25,29 +24,17 @@ struct PitchEntryForm: View {
                     HStack(alignment: .center, spacing: 15) {
                         // ... (Column 1 with Pitching Type buttons)
                         VStack(spacing: 20) {
-                            TextField("Batter", text: $playerName)
+                            TextField("Batter", text: $play.batter.name)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                             Text("Pitching Type") // ...
-                            HStack(spacing: 4) {
-                                ForEach(PitchType.allCases, id: \.self) { type in
-                                    Button(action: { pitchingType = type.rawValue }) {
-                                        // ... button style
-                                    }
-                                }
-                            }
+                            ButtonRow(selectedValue: $pitchingType)
                         }
-                        
+
                         VStack(spacing: 20) {
-                            TextField("VS.", text: $teamName)
+                            TextField("VS.", text: $play.pitcher.name)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                             Text("Pitching Result") // ...
-                            HStack(spacing: 4) {
-                                ForEach(PitchResult.allCases, id: \.self) { type in
-                                    Button(action: { pitchingResult = type.rawValue }) {
-                                        // ... button style
-                                    }
-                                }
-                            }
+                            ButtonRow(selectedValue: $pitchingResult)
                         }
 
                         VStack {
@@ -67,5 +54,16 @@ struct PitchEntryForm: View {
             .padding()
             .background(Color.white)
         }
+        
+//        VStack(alignment: .leading, spacing:25) {
+//            Spacer()
+//            HStack(alignment: .center, spacing: 15) {
+//                TextField("Batter", text: $play.batter.name)
+//                .textFieldStyle(RoundedBorderTextFieldStyle())
+//                TextField("Pitcher", text: $play.pitcher.name)
+//                .textFieldStyle(RoundedBorderTextFieldStyle())
+//            }
+//        }
     }
+        
 }

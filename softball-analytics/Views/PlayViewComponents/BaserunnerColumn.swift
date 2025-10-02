@@ -7,19 +7,15 @@
 
 import SwiftUI
 
-struct BaserunnerEntry: View {
+struct BaserunnerColumn: View {
     
     var body: some View {
-        ZStack {
-            Rectangle()
-                .fill(Color(.systemGray6))
-            
-            Image("field")
-                .resizable()
-                .scaledToFit()
-                .padding(10)
+        VStack(spacing: 10) {
+            ForEach(1...4, id: \.self) { index in
+                BaserunnerEntry()
+            }
         }
-        .frame(width: 230, height: 200)
+        .padding(.bottom)
     }
 }
 

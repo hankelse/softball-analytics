@@ -7,19 +7,30 @@
 
 import SwiftUI
 
-struct BaserunnerEntry: View {
+struct TopBanner: View {
+    @Binding var inning: Int
+    @Binding var isTopInning: Bool?
     
     var body: some View {
-        ZStack {
-            Rectangle()
-                .fill(Color(.systemGray6))
-            
-            Image("field")
-                .resizable()
-                .scaledToFit()
-                .padding(10)
-        }
-        .frame(width: 230, height: 200)
+        Rectangle()
+            .fill(Color(hex: "#002f86"))
+            .frame(maxWidth: .infinity)
+            .frame(height: 60)
+            .overlay(
+                HStack {
+                    Text("\(isTopInning! ? "TOP" : "BOT") OF \(inning)")
+                        .font(.title)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Text("0-0")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    
+                }
+                    .padding(.horizontal, 10)
+            )
+            .padding(.top, 70)
     }
 }
 

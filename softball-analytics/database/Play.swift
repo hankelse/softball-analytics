@@ -23,8 +23,8 @@ class Play {
     var outs: Int = -1
     
     // Participants
-    var pitcher: Player?
-    var batter: Player?
+    var pitcher: Player = Player(name: "Unknown Player")
+    var batter: Player = Player(name: "Unknown Player")
     
     // Pitch attributes
     var pitchType: PitchType?

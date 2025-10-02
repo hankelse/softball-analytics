@@ -33,7 +33,7 @@ struct softball_analyticsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            PlayView()
+            SeasonView()
         }
         .modelContainer(sharedModelContainer)
     }

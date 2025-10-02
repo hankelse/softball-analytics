@@ -7,30 +7,33 @@
 
 import SwiftUI
 
-struct TopBanner: View {
-    @Binding var inning: Int
-    @Binding var isTopInning: Bool?
-    
+struct ButtonRow<T: ButtonRowDisplayable>: View {
+    @Binding var selectedValue: T?
+    var activeColor: Color = .blue
+    var inactiveColor: Color = .clear
+    var textColor: Color = .blue
+
     var body: some View {
-        Rectangle()
-            .fill(Color(hex: "#002f86"))
-            .frame(maxWidth: .infinity)
-            .frame(height: 60)
-            .overlay(
-                HStack {
-                    Text("\(isTopInning! ? "TOP" : "BOT") OF \(inning)")
-                        .font(.title)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Text("0-0")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                    
+        HStack(spacing: 4) {
+            // T.allCases is available because T conforms to CaseIterable
+            ForEach(Array(T.allCases), id: \.self) { item in
+                Button(action: {
+                    selectedValue = item
+                }) {
+                    Text(item.abbreviation)
+                        .font(.system(.subheadline, design: .monospaced))
+                        .fontWeight(.bold)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 8)
+                        .foregroundColor(selectedValue == item ? .white : textColor)
+                        .background(selectedValue == item ? activeColor : inactiveColor)
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(textColor, lineWidth: 1)
+                        )
                 }
-                    .padding(.horizontal, 10)
-            )
-            .padding(.top, 70)
+            }
+        }
     }
 }
-

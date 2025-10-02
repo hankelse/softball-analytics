@@ -7,44 +7,19 @@
 
 import SwiftUI
 
-struct PriorData: View {
-    @Binding var showExtraFields1: Bool
-    @Binding var showExtraFields2: Bool
+struct BaserunnerEntry: View {
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            DisclosureGroup("Last Pitch", isExpanded: $showExtraFields1) {
-                VStack(alignment: .leading, spacing: 10) {
-                    TextField("Batting Average", text: .constant(""))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    TextField("Home Runs", text: .constant(""))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    TextField("RBIs", text: .constant(""))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                }
-                .padding(.top, 5)
-            }
-            .foregroundColor(Color(hex: "#002f86"))
-            .font(.headline)
+        ZStack {
+            Rectangle()
+                .fill(Color(.systemGray6))
             
-            DisclosureGroup("2 Pitches Ago", isExpanded: $showExtraFields2) {
-                VStack(alignment: .leading, spacing: 10) {
-                    TextField("Batting Average", text: .constant(""))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    TextField("Home Runs", text: .constant(""))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    TextField("RBIs", text: .constant(""))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                }
-                .padding(.top, 5)
-            }
-            .foregroundColor(Color(hex: "#002f86"))
-            .font(.headline)
+            Image("field")
+                .resizable()
+                .scaledToFit()
+                .padding(10)
         }
+        .frame(width: 230, height: 200)
     }
 }
 
