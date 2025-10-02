@@ -6,11 +6,11 @@
 //  Josh Smith
 //  10/1/25
 //
-
 import Foundation
 import SwiftSoup
 
-func fetch_text(from urlString: String) async throws -> String {
+
+func fetchText(from urlString: String) async throws -> String {
     // Get the html from a url, acting like the request.get function
     guard let url = URL(string: urlString) else {
         throw URLError(.badURL)
@@ -31,9 +31,9 @@ func fetch_text(from urlString: String) async throws -> String {
 }
 
 
-func get_box_score_links(url: String, base_url: String) async throws -> [String] {
+func getBoxScoreLinks(url: String, baseURL: String) async throws -> [String] {
     // Get links to box scores for all games in a season
-    let html: String = try await fetch_text(from: url)
+    let html: String = try await fetchText(from: url)
     
     var links: Set<String> = Set<String>()
     do {
@@ -46,7 +46,7 @@ func get_box_score_links(url: String, base_url: String) async throws -> [String]
 
                 if text.contains("Box Score") {
                     let href: String = try anchor.attr("href")
-                    let fullURL: String = base_url + href
+                    let fullURL: String = baseURL + href
                     links.insert(fullURL)
                 }
             }
@@ -59,9 +59,9 @@ func get_box_score_links(url: String, base_url: String) async throws -> [String]
 }
 
 
-func get_pdf_view_link(_ url: String) async throws -> String {
+func getPDFViewLink(_ url: String) async throws -> String {
     // Get link for PDF view from link to box score page
-    let html: String = try await fetch_text(from: url)
+    let html: String = try await fetchText(from: url)
 
     let doc: Document = try SwiftSoup.parse(html)
     guard let span = try doc.select("span.icon-pdf").first(),
@@ -74,9 +74,9 @@ func get_pdf_view_link(_ url: String) async throws -> String {
 }
 
 
-func get_download_link(from url: String) async throws -> String {
+func getDownloadLink(from url: String) async throws -> String {
     // Get link to download picture 
-    let html = try await fetch_text(from: url)
+    let html = try await fetchText(from: url)
 
     let doc: Document = try SwiftSoup.parse(html)
     let anchors: Elements = try doc.select("a")
@@ -95,8 +95,8 @@ func get_download_link(from url: String) async throws -> String {
         throw NSError(domain: "DownloadLinkError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Download link not found"])
     }
 
-    guard let range = link.range(of: "file_location=") else {
-        throw NSError(domain: "DownloadLinkError", code: 2, userInfo: [NSLocalizedDescriptionKey: "file_location parameter not found"])
+    guard let range = link.range(of: "fileLocation=") else {
+        throw NSError(domain: "DownloadLinkError", code: 2, userInfo: [NSLocalizedDescriptionKey: "fileLocation parameter not found"])
     }
 
     let startIndex = link.index(range.upperBound, offsetBy: 0)
@@ -106,17 +106,17 @@ func get_download_link(from url: String) async throws -> String {
 }
 
 
-func school_name_to_url(schedule_links: [String: String], school_name: String) -> String {
+func schoolNameToURL(scheduleLinks: [String: String], schoolName: String) -> String {
     // Return the corresponding athletics page link to the given school after checking that it's in the dictionary
-    if let link: String = schedule_links[school_name] {
+    if let link: String = scheduleLinks[schoolName] {
         return link
     } else {
-        fatalError("Not a valid school name: \(school_name)")
+        fatalError("Not a valid school name: \(schoolName)")
     }
 }
 
 
-func download_pdf(url: String, local_filename: String) async throws -> Void {
+func downloadPDF(url: String, localFilename: String) async throws -> Void {
     // Download PDF into pdfs folder from the given downloadable link
     guard let url: URL = URL(string: url) else {
         throw URLError(.badURL)
@@ -131,11 +131,11 @@ func download_pdf(url: String, local_filename: String) async throws -> Void {
 
     // Get file path to write to
     let fileURL: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-        .appendingPathComponent(local_filename)
+        .appendingPathComponent(localFilename)
 
     do {
         try data.write(to: fileURL)
-        print("PDF '\(local_filename)' downloaded successfully.")
+        print("PDF '\(localFilename)' downloaded successfully.")
     } catch {
         print("Error writing PDF to disk: \(error.localizedDescription)")
         throw error
@@ -143,9 +143,9 @@ func download_pdf(url: String, local_filename: String) async throws -> Void {
 }
 
 
-func main() async {
+func main() async -> Void {
     // Controls the flow of the program
-    let schedule_links: [String: String] = [
+    let scheduleLinks: [String: String] = [
         "amherst": "https://athletics.amherst.edu/sports/softball/schedule",
         "bates": "https://gobatesbobcats.com/sports/softball/schedule",
         "bowdoin": "https://athletics.bowdoin.edu/sports/softball/schedule",
@@ -158,21 +158,21 @@ func main() async {
         "williams": "https://ephsports.williams.edu/sports/softball/schedule",
     ]
 
-    for year in [2025] {
-        let school_names = schedule_links.keys.sorted()
-        for school_name: String in school_names {
-            let url: String = school_name_to_url(schedule_links: schedule_links, school_name: school_name)
-            let base_url: String = String(url.prefix(url.count - "/sports/softball/schedule".count))
+    for year: Int in [2025] {
+        let schoolNames = scheduleLinks.keys.sorted()
+        for schoolName: String in schoolNames {
+            let url: String = schoolNameToURL(scheduleLinks: scheduleLinks, schoolName: schoolName)
+            let baseURL: String = String(url.prefix(url.count - "/sports/softball/schedule".count))
 
             do {
-                let links: [String] = try await get_box_score_links(url: url, base_url: base_url)
+                let links: [String] = try await getBoxScoreLinks(url: url, baseURL: baseURL)
                 for (index, link) in links.enumerated() {
-                    let pdf_view_link: String = try await base_url + get_pdf_view_link(link)
+                    let pdfViewLink: String = try await baseURL + getPDFViewLink(link)
 
-                    let downloadable_link: String = try await get_download_link(from: pdf_view_link)
+                    let downloadableLink: String = try await getDownloadLink(from: pdfViewLink)
 
                     print("Downloading PDF...")
-                    try await download_pdf(url: downloadable_link, local_filename: "pdfs/\(school_name)-\(year)-\(index).pdf")
+                    try await downloadPDF(url: downloadableLink, localFilename: "pdfs/\(schoolName)-\(year)-\(index).pdf")
                 }
             } catch {
                 print("Error getting box score links:", error)
@@ -180,6 +180,7 @@ func main() async {
         }
     }
 }
+
 
 Task {
     await main()
