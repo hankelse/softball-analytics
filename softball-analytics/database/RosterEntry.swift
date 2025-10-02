@@ -10,7 +10,8 @@ import Foundation
 
 @Model
 class RosterEntry {
-    @Attribute(.unique) var id: UUID = UUID()
+//    @Attribute(.unique) var id: UUID = UUID()
+    var id: UUID = UUID()
     
     // The link to the permanent Player identity.
     var player: Player?
@@ -19,9 +20,9 @@ class RosterEntry {
     var seasonRoster: SeasonRoster?
     
     // --- Season-Specific Attributes ---
-    var jerseyNumber: Int
-    var isPitcher: Bool
-    var isActiveOnRoster: Bool
+    var jerseyNumber: Int?
+    var isPitcher: Bool?
+    var isActiveOnRoster: Bool?
 
     init(player: Player, seasonRoster: SeasonRoster, jerseyNumber: Int, isPitcher: Bool = false, isActiveOnRoster: Bool = true) {
         self.player = player

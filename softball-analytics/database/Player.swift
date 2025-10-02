@@ -10,8 +10,9 @@ import SwiftData
 
 @Model
 class Player {
-    @Attribute(.unique) var id: UUID = UUID()
-    var name: String
+//    @Attribute(.unique) var id: UUID = UUID()
+    var id: UUID = UUID()
+    var name: String?
     // This allows navigation from a player to their entire career history.
     @Relationship(inverse: \RosterEntry.player)
     var rosterEntries: [RosterEntry]?
