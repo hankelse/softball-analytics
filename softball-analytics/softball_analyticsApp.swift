@@ -22,7 +22,7 @@ struct softball_analyticsApp: App {
             Play.self,
             Runner.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, cloudKitDatabase: .none)
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
