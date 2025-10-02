@@ -10,16 +10,17 @@ import SwiftData
 
 @Model
 class Play {
-    @Attribute(.unique) var id: UUID = UUID()
+//    @Attribute(.unique) var id: UUID = UUID()
+    var id: UUID = UUID()
     var timestamp: Date = Date()
     var comment: String?
     
     // GameState attributes
-    var inning: Int
-    var isTopInning: Bool
-    var balls: Int
-    var strikes: Int
-    var outs: Int
+    var inning: Int = 1
+    var isTopInning: Bool?
+    var balls: Int = 0
+    var strikes: Int = 0
+    var outs: Int = -1
     
     // Participants
     var pitcher: Player?

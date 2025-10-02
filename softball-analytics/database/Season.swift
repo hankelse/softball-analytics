@@ -10,9 +10,10 @@ import Foundation
 
 @Model
 class Season {
-    @Attribute(.unique) var id: UUID = UUID()
-    var name: String
-    var year: Int
+//    @Attribute(.unique) var id: UUID = UUID()
+    var id: UUID = UUID()
+    var name: String?
+    var year: Int?
     
     // This connects to all the teams/rosters participating in this season.
     @Relationship(deleteRule: .cascade, inverse: \SeasonRoster.season)

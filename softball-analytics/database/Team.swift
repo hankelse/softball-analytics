@@ -10,8 +10,9 @@ import Foundation
 
 @Model
 class Team {
-    @Attribute(.unique) var id: UUID = UUID()
-    var name: String
+//    @Attribute(.unique) var id: UUID = UUID()
+    var id: UUID = UUID()
+    var name: String?
     
     // Connects to all instances of this team's participation across all seasons.
     @Relationship(inverse: \SeasonRoster.team)

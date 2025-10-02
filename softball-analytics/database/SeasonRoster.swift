@@ -10,7 +10,8 @@ import Foundation
 
 @Model
 class SeasonRoster {
-    @Attribute(.unique) var id: UUID = UUID()
+//    @Attribute(.unique) var id: UUID = UUID()
+    var id: UUID = UUID()
     
     // Link to the team this roster is for
     var team: Team?

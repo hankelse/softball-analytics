@@ -10,14 +10,16 @@ import Foundation
 
 @Model
 class Game {
-    @Attribute(.unique) var id: UUID = UUID()
-    var date: Date
+//    @Attribute(.unique) var id: UUID = UUID()
+    var id: UUID = UUID()
+    var date: Date = Date()
     
     var homeRoster: SeasonRoster?
     var awayRoster: SeasonRoster?
     
-    var homeTeamLineup: [Player]?
-    var awayTeamLineup: [Player]?
+//    @Relationship(inverse:)
+    var homeTeamLineup: [Int]?
+    var awayTeamLineup: [Int]?
     
     @Relationship(deleteRule: .cascade, inverse: \Play.game)
     var plays: [Play]?

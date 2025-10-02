@@ -9,7 +9,8 @@ import SwiftData
 
 @Model
 class Runner {
-    @Attribute(.unique) var id: UUID = UUID()
+//    @Attribute(.unique) var id: UUID = UUID()
+    var id: UUID = UUID()
     
     // The player who is running.
     var player: Player?
@@ -20,8 +21,8 @@ class Runner {
     // Where the runner ended up.
     var base: Base?
     
-    var didScore: Bool
-    var wasOut: Bool
+    var didScore: Bool?
+    var wasOut: Bool?
     var outReason: OutReason?
 
     init(player: Player, play: Play, base: Base?, didScore: Bool, wasOut: Bool, outReason: OutReason? = nil) {
