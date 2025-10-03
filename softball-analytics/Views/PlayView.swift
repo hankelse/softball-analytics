@@ -45,8 +45,11 @@ extension Color {
 struct PlayView: View {
     @Environment(\.modelContext) private var context
     
-    // This holds the current play info
-    @Bindable var play: Play
+    // Current game
+    @Bindable var game: Game
+    // Holds the current play info
+    @State var curr_play: Play
+    
     
     @State private var batterName: String = ""
     @State private var pitcherName: String = ""
@@ -57,6 +60,11 @@ struct PlayView: View {
     @State private var showExtraFields1: Bool = false
     @State private var showExtraFields2: Bool = false
 
+    init(game: Game) {
+        self.game = game
+        self._curr_play = State(initialValue: game.plays?.last ?? Play(inning: 1, isTopInning: true, balls: 0, strikes: 0, outs: 0))
+    }
+    
     var body: some View {
         ZStack(alignment: .top) {
             Color.white.ignoresSafeArea()
@@ -79,8 +87,8 @@ struct PlayView: View {
                 Spacer()
                 
                 TopBanner(
-                    inning: $play.inning,
-                    isTopInning: $play.isTopInning
+                    inning: $curr_play.inning,
+                    isTopInning: $curr_play.isTopInning
                 )
                 
                 // MAIN CONTENT AREA
@@ -152,33 +160,24 @@ struct PlayView: View {
             }
         }
         .onAppear {
-            self.batterName = play.batter?.name ?? "Unknown Player"
-            self.pitcherName = play.pitcher?.name ?? "Unknown Player"
-            self.pitchingType = play.pitchType
-            self.pitchingResult = play.pitchResult
-            self.notes = play.comment ?? ""
+            self.batterName = curr_play.batter?.name ?? "Unknown Player"
+            self.pitcherName = curr_play.pitcher?.name ?? "Unknown Player"
+            self.pitchingType = curr_play.pitchType
+            self.pitchingResult = curr_play.pitchResult
+            self.notes = curr_play.comment ?? ""
 
         }
     }
     
-    
+    private func getNextPlay() -> Play {
+        let next_play = Play(inning: 1, isTopInning: true, balls: 0, strikes: 0, outs: 0)
+        return next_play
+    }
 
     private func saveData() {
-        guard !teamName.isEmpty else {
-            print("Please enter a team name before saving.")
-            return
-        }
-
-        let newTeam = Team(name: teamName)
-        context.insert(newTeam)
-
-        do {
-            try context.save()
-            print("Saved Team: \(newTeam.name ?? "None")")
-            teamName = ""
-        } catch {
-            print("Error saving team: \(error.localizedDescription)")
-        }
+        
+        print(pitchingType ?? "No pitch type recorded")
+        print(pitchingResult ?? "No pitch result recorded")
     }
 }
 
@@ -187,7 +186,18 @@ struct PlayView: View {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: Play.self, configurations: config)
         
+        let sampleSeason = Season(name: "Sample", year: 2025)
+        let sampleHomeTeam = Team(name: "Sample Home Team")
+        let sampleAwayTeam = Team(name: "Sample Away Team")
+        
+        let sampleHomeRoster = SeasonRoster(team: sampleHomeTeam, season: sampleSeason)
+        let sampleAwayRoster = SeasonRoster(team: sampleAwayTeam, season: sampleSeason)
+        
+        let sampleGame = Game(date: Date(), season: sampleSeason, homeRoster: sampleHomeRoster, awayRoster: sampleAwayRoster)
+        
         let samplePlay = Play(inning: 4, isTopInning: true, balls: 1, strikes: 2, outs: 1)
+        
+        sampleGame.plays.append(samplePlay)
         
         let sampleBatter = Player(name: "Lydia Mirabito")
         samplePlay.batter = sampleBatter
@@ -195,7 +205,7 @@ struct PlayView: View {
         let samplePitcher = Player(name: "Mydia Lirabito")
         samplePlay.pitcher = samplePitcher
         
-        return PlayView(play: samplePlay)
+        return PlayView(game: sampleGame)
             .modelContainer(container)
     } catch {
         return Text("Failed to create preview: \(error.localizedDescription)")
