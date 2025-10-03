@@ -181,33 +181,33 @@ struct PlayView: View {
     }
 }
 
-#Preview {
-    do {
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        let container = try ModelContainer(for: Play.self, configurations: config)
-        
-        let sampleSeason = Season(name: "Sample", year: 2025)
-        let sampleHomeTeam = Team(name: "Sample Home Team")
-        let sampleAwayTeam = Team(name: "Sample Away Team")
-        
-        let sampleHomeRoster = SeasonRoster(team: sampleHomeTeam, season: sampleSeason)
-        let sampleAwayRoster = SeasonRoster(team: sampleAwayTeam, season: sampleSeason)
-        
-        let sampleGame = Game(date: Date(), season: sampleSeason, homeRoster: sampleHomeRoster, awayRoster: sampleAwayRoster)
-        
-        let samplePlay = Play(inning: 4, isTopInning: true, balls: 1, strikes: 2, outs: 1)
-        
-        sampleGame.plays.append(samplePlay)
-        
-        let sampleBatter = Player(name: "Lydia Mirabito")
-        samplePlay.batter = sampleBatter
-        
-        let samplePitcher = Player(name: "Mydia Lirabito")
-        samplePlay.pitcher = samplePitcher
-        
-        return PlayView(game: sampleGame)
-            .modelContainer(container)
-    } catch {
-        return Text("Failed to create preview: \(error.localizedDescription)")
-    }
-}
+//#Preview {
+//    do {
+//        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+//        let container = try ModelContainer(for: Play.self, configurations: config)
+//        
+//        let sampleSeason = Season(name: "Sample", year: 2025)
+//        let sampleHomeTeam = Team(name: "Sample Home Team")
+//        let sampleAwayTeam = Team(name: "Sample Away Team")
+//        
+//        let sampleHomeRoster = SeasonRoster(team: sampleHomeTeam, season: sampleSeason)
+//        let sampleAwayRoster = SeasonRoster(team: sampleAwayTeam, season: sampleSeason)
+//        
+//        let sampleGame = Game(date: Date(), season: sampleSeason, homeRoster: sampleHomeRoster, awayRoster: sampleAwayRoster)
+//        
+//        let samplePlay = Play(inning: 4, isTopInning: true, balls: 1, strikes: 2, outs: 1)
+//        
+//        sampleGame.plays.append(samplePlay)
+//        
+//        let sampleBatter = Player(name: "Lydia Mirabito")
+//        samplePlay.batter = sampleBatter
+//        
+//        let samplePitcher = Player(name: "Mydia Lirabito")
+//        samplePlay.pitcher = samplePitcher
+//        
+//        return PlayView(game: sampleGame)
+//            .modelContainer(container)
+//    } catch {
+//        return Text("Failed to create preview: \(error.localizedDescription)")
+//    }
+//}
