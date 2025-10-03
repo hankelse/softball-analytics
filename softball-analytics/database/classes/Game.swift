@@ -31,8 +31,12 @@ class Game {
 
     init(date: Date, season: Season?, homeRoster: SeasonRoster?, awayRoster: SeasonRoster?) {
         self.date = date
-        self.season = season
+        self.season = season!
         self.homeRoster=homeRoster
         self.awayRoster=awayRoster
+        
+        if self.plays == nil {
+            self.plays = []   // initialize lazily
+        }
     }
 }

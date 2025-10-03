@@ -11,56 +11,79 @@ import SwiftData
 struct GameView: View {
     @Environment(\.modelContext) private var modelContext
     
-    @State var sampleSeason : Season
-    @State var sampleHomeTeam : Team
-    @State var sampleAwayTeam : Team
+    let season: Season
     
-    @State var sampleHomeRoster : SeasonRoster
-    @State var sampleAwayRoster : SeasonRoster
     
-    @State var sampleGame : Game
+    @Query private var games: [Game]
     
-    init() {
-            // Phase 1: Initialize all stored properties without referencing self
-            let season = Season(name: "Sample", year: 2025)
-            let homeTeam = Team(name: "Sample Home Team")
-            let awayTeam = Team(name: "Sample Away Team")
-            
-            let homeRoster = SeasonRoster(team: homeTeam, season: season)
-            let awayRoster = SeasonRoster(team: awayTeam, season: season)
-        
-            let game = Game(date: Date(), season: season, homeRoster: homeRoster, awayRoster: awayRoster)
-            
-            // Now assign the initialized objects to the properties of self
-            self.sampleSeason = season
-            self.sampleHomeTeam = homeTeam
-            self.sampleAwayTeam = awayTeam
-            self.sampleHomeRoster = homeRoster
-            self.sampleAwayRoster = awayRoster
-            
-            // Phase 2 can now safely use self
-            self.sampleGame = game
-        }
+    init(season: Season) {
+        self.season = season
+        let seasonID = season.id   // grab the UUID before building predicate
+
+        self._games = Query(
+            filter: #Predicate<Game> { game in
+                game.season?.id == seasonID   // ✅ note the optional unwrap
+            },
+            sort: \.date
+        )
+    }
     
     var body: some View {
         NavigationStack {
             VStack {
-                Text("Welcome to the Game!")
-                    .font(.largeTitle)
+                Text("Games for \(season.name) \(String(season.year))")
+                    .font(.title)
                     .padding()
-
-                // This NavigationLink presents the PlayView and passes the game
-                NavigationLink(destination: PlayView(game: sampleGame)) {
-                    Text("Play Game")
-                        .font(.headline)
+                
+                if games.isEmpty {
+                    Text("No games yet")
+                        .foregroundColor(.gray)
                         .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+                } else {
+                    List(games) { game in
+                        NavigationLink {
+                            PlayView(game: game)
+                        } label: {
+                            Text("Game on \(game.date.formatted(date: .abbreviated, time: .shortened))")
+                        }
+                    }
                 }
+                
+                Spacer()
+                
+                Button("➕ Add New Game") {
+                    addNewGame()
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
-            .navigationTitle("Main Menu")
+            .navigationTitle("Games")
         }
     }
     
+    private func addNewGame() {
+        let homeTeam = Team(name: "Sample Home Team")
+        let awayTeam = Team(name: "Sample Away Team")
+        
+        let homeRoster = SeasonRoster(team: homeTeam, season: season)
+        let awayRoster = SeasonRoster(team: awayTeam, season: season)
+        
+        let game = Game(date: Date(), season: season,
+                        homeRoster: homeRoster, awayRoster: awayRoster)
+        
+        modelContext.insert(homeTeam)
+        modelContext.insert(awayTeam)
+        modelContext.insert(homeRoster)
+        modelContext.insert(awayRoster)
+        modelContext.insert(game)
+        
+        do {
+            try modelContext.save()
+            print("✅ New game created")
+        } catch {
+            print("❌ Save failed: \(error)")
+        }
+    }
 }

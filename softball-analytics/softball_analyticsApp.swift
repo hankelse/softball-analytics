@@ -22,7 +22,25 @@ struct softball_analyticsApp: App {
             Play.self,
             Runner.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        
+//        Container identifier: iCloud.softballData
+        
+        /*
+         
+         init(String?, schema: Schema?, isStoredInMemoryOnly: Bool, allowsSave: Bool, groupContainer: ModelConfiguration.GroupContainer, cloudKitDatabase: ModelConfiguration.CloudKitDatabase)
+         */
+
+
+//        
+//        let database = ModelConfiguration.CloudKitDatabase(containerIdentifier: "iCloud.softballData",
+//                                                           database: .private) // or .public / .shared)
+////        
+        var modelConfiguration = ModelConfiguration(schema: schema,
+                                                    isStoredInMemoryOnly: false,
+                                                    allowsSave: true,
+//                                                    groupContainer: ModelConfiguration.GroupContainer,
+                                                    cloudKitDatabase: .private("iCloud.softballData"))
+        
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
@@ -33,7 +51,7 @@ struct softball_analyticsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            GameView()
+            SeasonView()
         }
         .modelContainer(sharedModelContainer)
     }

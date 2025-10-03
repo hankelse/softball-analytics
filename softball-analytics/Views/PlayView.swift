@@ -62,7 +62,14 @@ struct PlayView: View {
 
     init(game: Game) {
         self.game = game
-        self._curr_play = State(initialValue: game.plays?.last ?? Play(inning: 1, isTopInning: true, balls: 0, strikes: 0, outs: 0))
+        if let lastPlay = game.plays?.last {
+            self._curr_play = State(initialValue: lastPlay)
+        } else {
+            let newPlay = Play(inning: 1, isTopInning: true, balls: 0, strikes: 0, outs: 0)
+            newPlay.game = game
+            game.plays?.append(newPlay)
+            self._curr_play = State(initialValue: newPlay)
+        }
     }
     
     var body: some View {
@@ -125,8 +132,9 @@ struct PlayView: View {
                             showExtraFields2: $showExtraFields2
                         )
                     }
-                        .frame(width: .infinity)
-                        .frame(height: .infinity)
+//                        .frame(width: .infinity)
+//                        .frame(height: .infinity)
+                        .frame(maxWidth: .infinity)
                         .padding(.bottom, 25)
                         .padding(15)
 
@@ -175,11 +183,28 @@ struct PlayView: View {
     }
 
     private func saveData() {
-        
-        print(pitchingType ?? "No pitch type recorded")
-        print(pitchingResult ?? "No pitch result recorded")
+        // Fill in play details
+        curr_play.pitchType = pitchingType
+        curr_play.pitchResult = pitchingResult
+        curr_play.comment = notes
+
+        // Link play to the game
+        curr_play.game = game
+        game.plays?.append(curr_play)
+
+        // Persist through helper
+        savePlay(curr_play, context: context)
+
+        // Debug through helper
+        debugPrintPlays(context: context)
+
+        // Reset
+        curr_play = getNextPlay()
     }
+    
 }
+
+
 
 //#Preview {
 //    do {

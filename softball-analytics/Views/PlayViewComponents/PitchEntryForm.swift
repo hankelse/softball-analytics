@@ -81,9 +81,10 @@ struct PitchEntryForm: View {
                         .foregroundColor(.white)
                         .background(Color.blue)
                         .cornerRadius(10)
+                        .frame(height: 44)
                 }
             }
-                .frame(width: .infinity, height: .infinity)
+                .frame(maxWidth: .infinity)
                 .background(Color.white)
                 .padding()
         }
