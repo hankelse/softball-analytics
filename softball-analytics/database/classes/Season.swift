@@ -12,8 +12,8 @@ import Foundation
 class Season {
 //    @Attribute(.unique) var id: UUID = UUID()
     var id: UUID = UUID()
-    var name: String?
-    var year: Int?
+    var name: String = "_no_name"
+    var year: Int = 0
     
     // This connects to all the teams/rosters participating in this season.
     @Relationship(deleteRule: .cascade, inverse: \SeasonRoster.season)
@@ -26,4 +26,11 @@ class Season {
         self.name = name
         self.year = year
     }
+    
+    // Readable ID
+    func displayName() -> String {
+            return "\(name) \(year)"
+        }
+    
+    
 }

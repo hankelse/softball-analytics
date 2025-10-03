@@ -45,18 +45,37 @@ extension Color {
 struct PlayView: View {
     @Environment(\.modelContext) private var context
     
-    @State private var playerName: String = ""
+    // Current game
+    @Bindable var game: Game
+    // Holds the current play info
+    @State var curr_play: Play
+    
+    
+    @State private var batterName: String = ""
+    @State private var pitcherName: String = ""
     @State private var teamName: String = ""
-    @State private var pitchingType: String = ""
-    @State private var pitchingResult: String = ""
+    @State private var pitchingType: PitchType?
+    @State private var pitchingResult: PitchResult?
     @State private var notes: String = ""
     @State private var showExtraFields1: Bool = false
     @State private var showExtraFields2: Bool = false
 
+    init(game: Game) {
+        self.game = game
+        if let lastPlay = game.plays?.last {
+            self._curr_play = State(initialValue: lastPlay)
+        } else {
+            let newPlay = Play(inning: 1, isTopInning: true, balls: 0, strikes: 0, outs: 0)
+            newPlay.game = game
+            game.plays?.append(newPlay)
+            self._curr_play = State(initialValue: newPlay)
+        }
+    }
+    
     var body: some View {
         ZStack(alignment: .top) {
             Color.white.ignoresSafeArea()
-
+            
             VStack(spacing: 0) {
                 /*
                 // HEADER
@@ -74,195 +93,56 @@ struct PlayView: View {
 
                 Spacer()
                 
-                Rectangle()
-                    .fill(Color(hex: "#002f86"))
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 60)
-                    .overlay(
-                        HStack {
-                            Text("TOP OF 3RD")
-                                .font(.title)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-
-                            Text("0-0")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            
-                        }
-                        .padding(.horizontal, 10)
-                    )
-                    .padding(.top, 70)
-
+                TopBanner(
+                    inning: $curr_play.inning,
+                    isTopInning: $curr_play.isTopInning
+                )
+                
                 // MAIN CONTENT AREA
                 HStack(alignment: .top, spacing: 2) {
                     // LEFT BOX (Original content)
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 25) {
-                            // ===== SECTION 1: Main Info =====
-                            VStack(alignment: .leading, spacing: 25) {
-
-                                VStack {
-                                    Spacer()
-
-                                    HStack(alignment: .center, spacing: 15) {
-                                        // Column 1
-                                        VStack(spacing: 20) {
-                                            TextField("Batter", text: $playerName)
-                                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                            
-                                            // Pitching Type
-                                            Text("Pitching Type")
-                                                .font(.subheadline)
-                                                .bold()
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-
-                                            HStack(spacing: 4) {
-                                                ForEach(PitchType.allCases, id: \.self) { type in
-                                                    Button(action: {
-                                                        pitchingType = type.rawValue
-                                                    }) {
-                                                        Text(type.rawValue.prefix(2).uppercased())
-                                                            .font(.system(size: 10, weight: .semibold))
-                                                            .padding(.vertical, 5)
-                                                            .padding(.horizontal, 7)
-                                                            .background(pitchingType == type.rawValue ? Color(hex: "#002f86") : Color.white)
-                                                            .foregroundColor(pitchingType == type.rawValue ? .white : .black)
-                                                            .cornerRadius(4)
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 4)
-                                                                    .stroke(Color.gray.opacity(0.5), lineWidth: 0.8)
-                                                            )
-                                                    }
-                                                }
-                                            }
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                        }
-
-                                        // Column 2
-                                        VStack(spacing: 20) {
-                                            TextField("VS.", text: $teamName)
-                                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                            
-                                            // Pitching Result
-                                            Text("Pitching Result")
-                                                .font(.subheadline)
-                                                .bold()
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-
-                                            HStack(spacing: 4) {
-                                                ForEach(PitchResult.allCases, id: \.self) { type in
-                                                    Button(action: {
-                                                        pitchingResult = type.rawValue
-                                                    }) {
-                                                        Text(type.rawValue.prefix(2).uppercased())
-                                                            .font(.system(size: 10, weight: .semibold))
-                                                            .padding(.vertical, 5)
-                                                            .padding(.horizontal, 7)
-                                                            .background(pitchingResult == type.rawValue ? Color(hex: "#002f86") : Color.white)
-                                                            .foregroundColor(pitchingResult == type.rawValue ? .white : .black)
-                                                            .cornerRadius(4)
-                                                            .overlay(
-                                                                RoundedRectangle(cornerRadius: 4)
-                                                                    .stroke(Color.gray.opacity(0.5), lineWidth: 0.8)
-                                                            )
-                                                    }
-                                                }
-                                            }
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                        }
-
-                                        // Column 3: Graphic
-                                        VStack {
-                                            Image("strikeZone")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 150, height: 150)
-                                        }
-                                    }
-                                    Button("NEXT PITCH") {
-                                        saveData()
-                                    }
-                                    .frame(width: 100, height: 30) // button size
-                                    .background(Color(hex: "#002f86"))
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 12, weight: .semibold)) // smaller text
-                                    .cornerRadius(3)
-                                    .padding(.top, 10)
-                                    
-                                    Spacer()
-                                }
-                                .frame(maxHeight: .infinity)
-                            }
-                            .padding()
-                            .background(Color.white)
-                            
-                            // Divider between main section and collapsible section
-                            Divider()
-                                .padding(.vertical, 10)
-
-                            // ===== SECTION 2: Collapsible Menus =====
-                            VStack(alignment: .leading, spacing: 15) {
-                                DisclosureGroup("Last Pitch", isExpanded: $showExtraFields1) {
-                                    VStack(alignment: .leading, spacing: 10) {
-                                        TextField("Batting Average", text: .constant(""))
-                                            .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                                        TextField("Home Runs", text: .constant(""))
-                                            .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                                        TextField("RBIs", text: .constant(""))
-                                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    }
-                                    .padding(.top, 5)
-                                }
-                                .foregroundColor(Color(hex: "#002f86"))
-                                .font(.headline)
-
-                                DisclosureGroup("2 Pitches Ago", isExpanded: $showExtraFields2) {
-                                    VStack(alignment: .leading, spacing: 10) {
-                                        TextField("Batting Average", text: .constant(""))
-                                            .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                                        TextField("Home Runs", text: .constant(""))
-                                            .textFieldStyle(RoundedBorderTextFieldStyle())
-
-                                        TextField("RBIs", text: .constant(""))
-                                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    }
-                                    .padding(.top, 5)
-                                }
-                                .foregroundColor(Color(hex: "#002f86"))
-                                .font(.headline)
-                            }
-                        }
-                        .padding()
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 700)
-                    .background(
-                        Rectangle()
-                            .fill(Color(.systemGray6))
-                    )
                     
+                    ScrollView {
+                        // ===== SECTION 1: Pitch Entry Menu =====
+                        VStack {
+                            PitchEntryForm(
+                                batterName: $batterName,
+                                pitcherName: $pitcherName,
+                                pitchingType: $pitchingType,
+                                pitchingResult: $pitchingResult,
+                                onNextPitch: {
+                                    saveData()
+                                }
+                            )
+                        }
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(lineWidth: 0)
+                        )
+                        
+                        
+                        // Divider between main section and collapsible section
+                        Divider().padding(.vertical, 10)
+                        
+                        // ===== SECTION 2: Collapsible Menus =====
+                        PriorData(
+                            showExtraFields1: $showExtraFields1,
+                            showExtraFields2: $showExtraFields2
+                        )
+                    }
+//                        .frame(width: .infinity)
+//                        .frame(height: .infinity)
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 25)
+                        .padding(15)
 
+                    
+                    
                     // RIGHT BOX (New, scrolls independently)
                     ScrollView {
-                        VStack(spacing: 10) {
-                            ForEach(1...4, id: \.self) { index in
-                                ZStack {
-                                    Rectangle()
-                                        .fill(Color(.systemGray6))
-
-                                    Image("field")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .padding(10)
-                                }
-                                .frame(width: 230, height: 200)
-                            }
-                        }
-                        .padding(.bottom)
+                        BaserunnerColumn()
                     }
                     .frame(width: 250, height: 700)
                    
@@ -287,27 +167,72 @@ struct PlayView: View {
                  */
             }
         }
+        .onAppear {
+            self.batterName = curr_play.batter?.name ?? "Unknown Player"
+            self.pitcherName = curr_play.pitcher?.name ?? "Unknown Player"
+            self.pitchingType = curr_play.pitchType
+            self.pitchingResult = curr_play.pitchResult
+            self.notes = curr_play.comment ?? ""
+
+        }
+    }
+    
+    private func getNextPlay() -> Play {
+        let next_play = Play(inning: 1, isTopInning: true, balls: 0, strikes: 0, outs: 0)
+        return next_play
     }
 
     private func saveData() {
-        guard !teamName.isEmpty else {
-            print("Please enter a team name before saving.")
-            return
-        }
+        // Fill in play details
+        curr_play.pitchType = pitchingType
+        curr_play.pitchResult = pitchingResult
+        curr_play.comment = notes
 
-        let newTeam = Team(name: teamName)
-        context.insert(newTeam)
+        // Link play to the game
+        curr_play.game = game
+        game.plays?.append(curr_play)
 
-        do {
-            try context.save()
-            print("Saved Team: \(newTeam.name ?? "None")")
-            teamName = ""
-        } catch {
-            print("Error saving team: \(error.localizedDescription)")
-        }
+        // Persist through helper
+        savePlay(curr_play, context: context)
+
+        // Debug through helper
+        debugPrintPlays(context: context)
+
+        // Reset
+        curr_play = getNextPlay()
     }
+    
 }
 
-#Preview {
-    PlayView()
-}
+
+
+//#Preview {
+//    do {
+//        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+//        let container = try ModelContainer(for: Play.self, configurations: config)
+//        
+//        let sampleSeason = Season(name: "Sample", year: 2025)
+//        let sampleHomeTeam = Team(name: "Sample Home Team")
+//        let sampleAwayTeam = Team(name: "Sample Away Team")
+//        
+//        let sampleHomeRoster = SeasonRoster(team: sampleHomeTeam, season: sampleSeason)
+//        let sampleAwayRoster = SeasonRoster(team: sampleAwayTeam, season: sampleSeason)
+//        
+//        let sampleGame = Game(date: Date(), season: sampleSeason, homeRoster: sampleHomeRoster, awayRoster: sampleAwayRoster)
+//        
+//        let samplePlay = Play(inning: 4, isTopInning: true, balls: 1, strikes: 2, outs: 1)
+//        
+//        sampleGame.plays.append(samplePlay)
+//        
+//        let sampleBatter = Player(name: "Lydia Mirabito")
+//        samplePlay.batter = sampleBatter
+//        
+//        let samplePitcher = Player(name: "Mydia Lirabito")
+//        samplePlay.pitcher = samplePitcher
+//        
+//        return PlayView(game: sampleGame)
+//            .modelContainer(container)
+//    } catch {
+//        return Text("Failed to create preview: \(error.localizedDescription)")
+//    }
+//}
