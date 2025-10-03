@@ -45,6 +45,7 @@ struct PriorData: View {
             .foregroundColor(Color(hex: "#002f86"))
             .font(.headline)
         }
+        .padding(15)
     }
 }
 

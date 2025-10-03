@@ -15,7 +15,7 @@ struct BaserunnerColumn: View {
                 BaserunnerEntry()
             }
         }
-        .padding(.bottom)
+        .padding()
     }
 }
 

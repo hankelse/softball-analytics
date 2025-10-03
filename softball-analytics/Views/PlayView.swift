@@ -48,7 +48,8 @@ struct PlayView: View {
     // This holds the current play info
     @Bindable var play: Play
     
-    @State private var playerName: String = ""
+    @State private var batterName: String = ""
+    @State private var pitcherName: String = ""
     @State private var teamName: String = ""
     @State private var pitchingType: PitchType?
     @State private var pitchingResult: PitchResult?
@@ -85,16 +86,27 @@ struct PlayView: View {
                 // MAIN CONTENT AREA
                 HStack(alignment: .top, spacing: 2) {
                     // LEFT BOX (Original content)
+                    
                     ScrollView {
                         // ===== SECTION 1: Pitch Entry Menu =====
-                        PitchEntryForm(
-                            playerName: $playerName,
-                            pitchingType: $pitchingType,
-                            pitchingResult: $pitchingResult,
-                            onNextPitch: {
-                                saveData()
-                            }
+                        VStack {
+                            PitchEntryForm(
+                                batterName: $batterName,
+                                pitcherName: $pitcherName,
+                                pitchingType: $pitchingType,
+                                pitchingResult: $pitchingResult,
+                                onNextPitch: {
+                                    saveData()
+                                }
+                            )
+                        }
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(lineWidth: 0)
                         )
+                        
                         
                         // Divider between main section and collapsible section
                         Divider().padding(.vertical, 10)
@@ -105,12 +117,12 @@ struct PlayView: View {
                             showExtraFields2: $showExtraFields2
                         )
                     }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 700)
-                    .background(
-                        Rectangle()
-                            .fill(Color(.systemGray6))
-                    )
+                        .frame(width: .infinity)
+                        .frame(height: .infinity)
+                        .padding(.bottom, 25)
+                        .padding(15)
+
+                    
                     
                     // RIGHT BOX (New, scrolls independently)
                     ScrollView {
@@ -139,7 +151,17 @@ struct PlayView: View {
                  */
             }
         }
+        .onAppear {
+            self.batterName = play.batter?.name ?? "Unknown Player"
+            self.pitcherName = play.pitcher?.name ?? "Unknown Player"
+            self.pitchingType = play.pitchType
+            self.pitchingResult = play.pitchResult
+            self.notes = play.comment ?? ""
+
+        }
     }
+    
+    
 
     private func saveData() {
         guard !teamName.isEmpty else {
@@ -169,6 +191,9 @@ struct PlayView: View {
         
         let sampleBatter = Player(name: "Lydia Mirabito")
         samplePlay.batter = sampleBatter
+        
+        let samplePitcher = Player(name: "Mydia Lirabito")
+        samplePlay.pitcher = samplePitcher
         
         return PlayView(play: samplePlay)
             .modelContainer(container)

@@ -10,16 +10,19 @@ import SwiftUI
 struct BaserunnerEntry: View {
     
     var body: some View {
-        ZStack {
-            Rectangle()
-                .fill(Color(.systemGray6))
-            
+        VStack {
             Image("field")
                 .resizable()
                 .scaledToFit()
                 .padding(10)
         }
-        .frame(width: 230, height: 200)
+        .frame(width: 230, height: 210)
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(lineWidth: 0)
+        )
     }
 }
 

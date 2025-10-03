@@ -9,7 +9,8 @@ import SwiftUI
 
 struct PitchEntryForm: View {
     // Two-way inhertiance from parent view
-    @Binding var playerName: String
+    @Binding var batterName: String
+    @Binding var pitcherName: String
     @Binding var pitchingType: PitchType?
     @Binding var pitchingResult: PitchResult?
     
@@ -17,53 +18,77 @@ struct PitchEntryForm: View {
     var onNextPitch: () -> Void
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 25) {
-            VStack(alignment: .leading, spacing: 25) {
-                VStack {
-                    Spacer()
-                    HStack(alignment: .center, spacing: 15) {
-                        // ... (Column 1 with Pitching Type buttons)
-                        VStack(spacing: 20) {
-                            TextField("Batter", text: $playerName)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                            Text("Pitching Type") // ...
-                            ButtonRow(selectedValue: $pitchingType)
-                        }
-
-                        VStack(spacing: 20) {
-                            TextField("VS.", text: $playerName)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                            Text("Pitching Result") // ...
-                            ButtonRow(selectedValue: $pitchingResult)
-                        }
-
-                        VStack {
-                            Image("strikeZone")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 150, height: 150)
-                        }
+        VStack {
+            // Pitch entry
+            VStack (alignment: .leading, spacing: 25) {
+                // Batter & pitcher names
+                HStack(alignment: .center, spacing: 25) {
+                    // Batter label + name
+                    HStack(alignment: .center, spacing: 5) {
+                        Text("Batter: ")
+                        Text(batterName)
+                            .padding(5)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.gray)
+                            )
+                            .foregroundColor(.white)
                     }
+                    // Hitter label + name
+                    HStack(alignment: .center, spacing: 5) {
+                        Text("Pitcher: ")
+                        Text(pitcherName)
+                            .padding(5)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.gray)
+                            )
+                            .foregroundColor(.white)
+                    }
+                    
+                }
+                //Pitch info
+                HStack(alignment: .center, spacing: 15) {
+                    Spacer()
+                    // Pitch type & result
+                    VStack (spacing:15) {
+                        Text("Pitch Type")
+                        ButtonRow(selectedValue: $pitchingType)
+                        
+                        Text("Pitch Result")
+                        ButtonRow(selectedValue: $pitchingResult)
+                    }
+                    Spacer()
+                    Image("strikeZone")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
+                    
+                    Image("field")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
+                    Spacer()
+                }
+                
+                // Next pitch button
+                HStack(){
+                    Spacer()
                     Button("NEXT PITCH") {
                         onNextPitch()
                     }
-                    Spacer()
+                        .padding(8)
+                        .foregroundColor(.white)
+                        .background(Color.blue)
+                        .cornerRadius(10)
                 }
-                .frame(maxHeight: .infinity)
             }
-            .padding()
-            .background(Color.white)
+                .frame(width: .infinity, height: .infinity)
+                .background(Color.white)
+                .padding()
         }
-        
-//        VStack(alignment: .leading, spacing:25) {
-//            Spacer()
-//            HStack(alignment: .center, spacing: 15) {
-//                TextField("Batter", text: $play.batter.name)
-//                .textFieldStyle(RoundedBorderTextFieldStyle())
-//                TextField("Pitcher", text: $play.pitcher.name)
-//                .textFieldStyle(RoundedBorderTextFieldStyle())
-//            }
-//        }
+            .background(Color.white)
+            .padding()
+
     }
-        
 }
