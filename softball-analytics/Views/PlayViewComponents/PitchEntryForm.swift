@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PitchEntryForm: View {
     // Two-way inhertiance from parent view
-    @Bindable var play: Play
+    @Binding var playerName: String
     @Binding var pitchingType: PitchType?
     @Binding var pitchingResult: PitchResult?
     
@@ -24,14 +24,14 @@ struct PitchEntryForm: View {
                     HStack(alignment: .center, spacing: 15) {
                         // ... (Column 1 with Pitching Type buttons)
                         VStack(spacing: 20) {
-                            TextField("Batter", text: $play.batter.name)
+                            TextField("Batter", text: $playerName)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                             Text("Pitching Type") // ...
                             ButtonRow(selectedValue: $pitchingType)
                         }
 
                         VStack(spacing: 20) {
-                            TextField("VS.", text: $play.pitcher.name)
+                            TextField("VS.", text: $playerName)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                             Text("Pitching Result") // ...
                             ButtonRow(selectedValue: $pitchingResult)

@@ -48,13 +48,10 @@ struct PlayView: View {
     // This holds the current play info
     @Bindable var play: Play
     
+    @State private var playerName: String = ""
+    @State private var teamName: String = ""
     @State private var pitchingType: PitchType?
     @State private var pitchingResult: PitchResult?
-    @State private var pitchZoneX: Double?
-    @State private var pitchZoneY: Double?
-    @State private var hitLocationX: Double?
-    @State private var hitLocationY: Double?
-    
     @State private var notes: String = ""
     @State private var showExtraFields1: Bool = false
     @State private var showExtraFields2: Bool = false
@@ -65,19 +62,19 @@ struct PlayView: View {
             
             VStack(spacing: 0) {
                 /*
-                 // HEADER
-                 Rectangle()
-                 .fill(Color(hex: "#002f86"))
-                 .frame(height: 60)
-                 .overlay(
-                 Text("SOFTBALL ANALYTICS")
-                 .font(.title2)
-                 .foregroundColor(.white)
-                 .bold()
+                // HEADER
+                Rectangle()
+                    .fill(Color(hex: "#002f86"))
+                    .frame(height: 60)
+                    .overlay(
+                        Text("SOFTBALL ANALYTICS")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .bold()
                  )
                  
                  */
-                
+
                 Spacer()
                 
                 TopBanner(
@@ -87,16 +84,17 @@ struct PlayView: View {
                 
                 // MAIN CONTENT AREA
                 HStack(alignment: .top, spacing: 2) {
+                    // LEFT BOX (Original content)
                     ScrollView {
                         // ===== SECTION 1: Pitch Entry Menu =====
-//                        PitchEntryForm(
-//                            play: play,
-//                            pitchingType: $pitchingType,
-//                            pitchingResult: $pitchingResult,
-//                            onNextPitch: {
-//                                saveData()
-//                            }
-//                        )
+                        PitchEntryForm(
+                            playerName: $playerName,
+                            pitchingType: $pitchingType,
+                            pitchingResult: $pitchingResult,
+                            onNextPitch: {
+                                saveData()
+                            }
+                        )
                         
                         // Divider between main section and collapsible section
                         Divider().padding(.vertical, 10)
@@ -107,8 +105,8 @@ struct PlayView: View {
                             showExtraFields2: $showExtraFields2
                         )
                     }
-                    .padding()
                     .frame(maxWidth: .infinity)
+                    .frame(height: 700)
                     .background(
                         Rectangle()
                             .fill(Color(.systemGray6))
@@ -118,55 +116,56 @@ struct PlayView: View {
                     ScrollView {
                         BaserunnerColumn()
                     }
-                    .frame(width: 250)
+                    .frame(width: 250, height: 700)
+                   
+                    
                 }
-                .frame(height: 700)
-                
-            }
-            .padding(5)
-            .frame(maxWidth: .infinity, alignment: .center)
-            
-            Spacer()
-            
-            /*
-             // FOOTER
-             Rectangle()
-             .fill(Color(hex: "#002f86"))
-             .frame(height: 50)
-             .overlay(
-             Text("© 2025 Softball Analytics")
-             .font(.footnote)
-             .foregroundColor(.white)
-             )
-             */
-        }
-        
-        // When the view is first shown, populate values
-        .onAppear {
-            self.pitchingType = play.pitchType
-            self.pitchingResult = play.pitchResult
-            self.notes = play.comment ?? ""
-            self.pitchZoneX = play.pitchZoneX
-            self.pitchZoneY = play.pitchZoneY
-            self.hitLocationX = play.hitLocationX
-            self.hitLocationY = play.hitLocationY
-        }
-        
+                .padding(5)
+                .frame(maxWidth: .infinity, alignment: .center)
 
+
+                Spacer()
+                
+                /*
+                // FOOTER
+                Rectangle()
+                    .fill(Color(hex: "#002f86"))
+                    .frame(height: 50)
+                    .overlay(
+                        Text("© 2025 Softball Analytics")
+                            .font(.footnote)
+                            .foregroundColor(.white)
+                    )
+                 */
+            }
+        }
     }
 
     private func saveData() {
-        
+        guard !teamName.isEmpty else {
+            print("Please enter a team name before saving.")
+            return
+        }
+
+        let newTeam = Team(name: teamName)
+        context.insert(newTeam)
+
+        do {
+            try context.save()
+            print("Saved Team: \(newTeam.name ?? "None")")
+            teamName = ""
+        } catch {
+            print("Error saving team: \(error.localizedDescription)")
+        }
     }
 }
 
-// Set up a sample database for XCode previewing
 #Preview {
     do {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: Play.self, configurations: config)
         
-        let samplePlay = Play(inning: 3, isTopInning: true, balls: 1, strikes: 2, outs: 1)
+        let samplePlay = Play(inning: 4, isTopInning: true, balls: 1, strikes: 2, outs: 1)
         
         let sampleBatter = Player(name: "Lydia Mirabito")
         samplePlay.batter = sampleBatter
