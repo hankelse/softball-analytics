@@ -177,8 +177,80 @@ struct PlayView: View {
         }
     }
     
-    private func getNextPlay() -> Play {
-        let next_play = Play(inning: 1, isTopInning: true, balls: 0, strikes: 0, outs: 0)
+    private func getNextPlay(prev_play: Play) -> Play {
+        // Start with the state of the previous play
+        var next_inning = prev_play.inning
+        var next_isTopInning = prev_play.isTopInning ?? true
+        var next_balls = prev_play.balls
+        var next_strikes = prev_play.strikes
+        var next_outs = prev_play.outs
+
+        // Determine the outcome of the last pitch
+        switch prev_play.pitchResult {
+        case .ball:
+            if prev_play.balls == 3 { // A walk occurred
+                next_balls = 0
+                next_strikes = 0
+            } else {
+                next_balls += 1
+            }
+            
+        case .strikeLooking, .strikeSwinging:
+            if prev_play.strikes == 2 { // A strikeout occurred
+                next_outs += 1
+                next_balls = 0
+                next_strikes = 0
+            } else {
+                next_strikes += 1
+            }
+            
+        case .foul:
+            // A foul only adds a strike if there are fewer than 2 strikes.
+            if prev_play.strikes < 2 {
+                next_strikes += 1
+            }
+            // The at-bat continues, ball count is unchanged.
+            
+        case .hit, .hitByPitch:
+            // The at-bat is over. Reset the count.
+            next_balls = 0
+            next_strikes = 0
+            
+            // Check for any outs that occurred on the play from runner actions
+            let outsOnPlay = prev_play.runners?.filter { $0.wasOut == true }.count ?? 0
+            next_outs += outsOnPlay
+            
+        case .none:
+            // If there was no pitch result, assume no change.
+            break
+        }
+
+        // --- Check for Inning Change ---
+        // If the number of outs reaches 3 (or more), the inning is over.
+        if next_outs >= 3 {
+            next_outs = 0
+            next_balls = 0
+            next_strikes = 0
+            
+            if next_isTopInning {
+                // If it was the top of the inning, switch to the bottom.
+                next_isTopInning = false
+            } else {
+                // If it was the bottom of the inning, switch to the top of the next inning.
+                next_isTopInning = true
+                next_inning += 1
+            }
+        }
+        
+        // Create the new Play object with the calculated game state.
+        let next_play = Play(
+            inning: next_inning,
+            isTopInning: next_isTopInning,
+            balls: next_balls,
+            strikes: next_strikes,
+            outs: next_outs
+        )
+        
         return next_play
     }
 
@@ -199,7 +271,7 @@ struct PlayView: View {
         debugPrintPlays(context: context)
 
         // Reset
-        curr_play = getNextPlay()
+        curr_play = getNextPlay(prev_play : curr_play)
     }
     
 }

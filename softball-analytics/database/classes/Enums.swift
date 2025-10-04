@@ -69,5 +69,22 @@ enum PitchResult: String, Codable, CaseIterable, ButtonRowDisplayable {
 
 // Used by RunnerAction to specify why a player was out.
 enum OutReason: String, Codable, CaseIterable {
-    case forceOut, tagOut, flyOut, groundout, caughtStealing, fielderChoice
+    case forceOut, tagOut, flyOut, groundOut, caughtStealing, fielderChoice
+    
+    var abbreviation: String {
+        switch self {
+        case .forceOut:
+            return "FO"
+        case .tagOut:
+            return "TG"
+        case .flyOut:
+            return "FL"
+        case .groundOut:
+            return "GD"
+        case .caughtStealing:
+            return "CS"
+        case .fielderChoice:
+            return "FC"
+        }
+    }
 }
